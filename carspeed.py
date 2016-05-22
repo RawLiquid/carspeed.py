@@ -48,7 +48,7 @@ def draw_rectangle(event,x,y,flags,param):
 # define some constants
 DISTANCE = 33  #<---- enter your distance-to-road value here
 THRESHOLD = 15
-MIN_AREA = 175
+MIN_AREA = 175*10
 BLURSIZE = (15,15)
 IMAGEWIDTH = 640
 IMAGEHEIGHT = 480
