@@ -46,7 +46,7 @@ def draw_rectangle(event,x,y,flags,param):
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
         
 # define some constants
-DISTANCE = 76  #<---- enter your distance-to-road value here
+DISTANCE = 33  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 MIN_AREA = 175
 BLURSIZE = (15,15)
@@ -94,7 +94,7 @@ abs_chg = 0
 mph = 0
 secs = 0.0
 show_bounds = True
-showImage = True
+showImage = False
 ix,iy = -1,-1
 fx,fy = -1,-1
 drawing = False
@@ -135,11 +135,8 @@ prompt_on_image(prompt)
 while not setup_complete:
     cv2.imshow("Speed Camera",image)
  
-    #wait for for c to be pressed  
-    key = cv2.waitKey(1) & 0xFF
-  
     # if the `c` key is pressed, break from the loop
-    if key == ord("c"):
+    if (cv2.waitKey(1) & 0xFF == ord("c")):
         break
 
 # the monitored area is defined, time to move on
@@ -282,7 +279,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
-    if (state == WAITING) or (loop_count > 50):    
+    if (state == WAITING) and (loop_count > 10):    
  
         # draw the text and timestamp on the frame
         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
@@ -309,6 +306,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
             break
+        if (key == ord("i") and showImage == "True"):
+            showImage="False"
+        if (key == ord("i") and showImage == "False"):
+            showImage="True"
+
         loop_count = 0
          
     # clear the stream in preparation for the next frame
