@@ -122,8 +122,9 @@ rawCapture = PiRGBArray(camera, size=camera.resolution)
 time.sleep(0.9)
 
 # create an image window and place it in the upper left corner of the screen
-cv2.namedWindow("Speed Camera")
-cv2.moveWindow("Speed Camera", 0, 40)
+if (showImage):
+    cv2.namedWindow("Speed Camera")
+    cv2.moveWindow("Speed Camera", 0, 40)
 
 if (setup_complete == False):
     # call the draw_rectangle routines when the mouse is used
@@ -202,7 +203,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         base_image = gray.copy().astype("float")
         lastTime = timestamp
         rawCapture.truncate(0)
-        cv2.imshow("Speed Camera", image)
+        if (showImage):
+            cv2.imshow("Speed Camera", image)
         continue
  
     # compute the absolute difference between the current image and
