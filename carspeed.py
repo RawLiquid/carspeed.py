@@ -252,7 +252,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                     direction = RIGHT_TO_LEFT
                     abs_chg = initial_x - x
                     mph = get_speed(abs_chg,ftperpixelrl,secs)
-                print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
+                print("--> chg={}  secs={}  mph={} this_x={} w={} h={} a={}".format(abs_chg,secs,"%.0f" % mph,x,w,h,found_area))
                 real_y = upper_left_y + y
                 real_x = upper_left_x + x
                 # is front of object outside the monitired boundary? Then write date, time and speed on image
