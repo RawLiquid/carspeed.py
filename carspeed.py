@@ -66,8 +66,14 @@ RIGHT_TO_LEFT = 2
 
 # calculate the the width of the image at the distance specified
 frame_width_ft = 2*(math.tan(math.radians(FOV*0.5))*DISTANCE)
+frame_width_near_ft = 2*(math.tan(math.radians(FOV*0.5))*(DISTANCE-6))
+frame_width_far_ft = 2*(math.tan(math.radians(FOV*0.5))*(DISTANCE+1))
+
+
 ftperpixel = frame_width_ft / float(IMAGEWIDTH)
-print("Image width in feet {} at {} from camera".format("%.0f" % frame_width_ft,"%.0f" % DISTANCE))
+ftperpixellr = frame_width_near_ft / float(IMAGEWIDTH)
+ftperpixelrl = frame_width_far_ft / float(IMAGEWIDTH)
+print("Image width in feet {} for near side, and {} for far side from camera".format("%.0f" % frame_width_near_ft,"%.0f" % frame_width_far_ft))
 
 # state maintains the state of the speed computation process
 # if starts as WAITING
@@ -95,10 +101,10 @@ mph = 0
 secs = 0.0
 show_bounds = True
 showImage = False
-ix,iy = -1,-1
-fx,fy = -1,-1
+ix,iy = 90,163
+fx,fy = 599,301
 drawing = False
-setup_complete = False
+setup_complete = True
 tracking = False
 text_on_image = 'No cars'
 loop_count = 0
@@ -117,27 +123,28 @@ time.sleep(0.9)
 
 # create an image window and place it in the upper left corner of the screen
 cv2.namedWindow("Speed Camera")
-cv2.moveWindow("Speed Camera", 10, 40)
+cv2.moveWindow("Speed Camera", 0, 40)
 
-# call the draw_rectangle routines when the mouse is used
-cv2.setMouseCallback('Speed Camera',draw_rectangle)
+if (setup_complete == False):
+    # call the draw_rectangle routines when the mouse is used
+    cv2.setMouseCallback('Speed Camera',draw_rectangle)
  
-# grab a reference image to use for drawing the monitored area's boundry
-camera.capture(rawCapture, format="bgr", use_video_port=True)
-image = rawCapture.array
-rawCapture.truncate(0)
-org_image = image.copy()
+    # grab a reference image to use for drawing the monitored area's boundry
+    camera.capture(rawCapture, format="bgr", use_video_port=True)
+    image = rawCapture.array
+    rawCapture.truncate(0)
+    org_image = image.copy()
 
-prompt = "Define the monitored area - press 'c' to continue" 
-prompt_on_image(prompt)
+    prompt = "Define the monitored area - press 'c' to continue" 
+    prompt_on_image(prompt)
  
-# wait while the user draws the monitored area's boundry
-while not setup_complete:
-    cv2.imshow("Speed Camera",image)
+    # wait while the user draws the monitored area's boundry
+    while not setup_complete:
+        cv2.imshow("Speed Camera",image)
  
-    # if the `c` key is pressed, break from the loop
-    if (cv2.waitKey(1) & 0xFF == ord("c")):
-        break
+        # if the `c` key is pressed, break from the loop
+        if (cv2.waitKey(1) & 0xFF == ord("c")):
+            break
 
 # the monitored area is defined, time to move on
 prompt = "Press 'q' to quit" 
@@ -236,14 +243,15 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         else:
 
             if state == TRACKING:       
+                secs = secs_diff(timestamp,initial_time)
                 if x >= last_x:
                     direction = LEFT_TO_RIGHT
                     abs_chg = x + w - initial_x
+                    mph = get_speed(abs_chg,ftperpixellr,secs)
                 else:
                     direction = RIGHT_TO_LEFT
                     abs_chg = initial_x - x
-                secs = secs_diff(timestamp,initial_time)
-                mph = get_speed(abs_chg,ftperpixel,secs)
+                    mph = get_speed(abs_chg,ftperpixelrl,secs)
                 print("--> chg={}  secs={}  mph={} this_x={} w={} ".format(abs_chg,secs,"%.0f" % mph,x,w))
                 real_y = upper_left_y + y
                 real_x = upper_left_x + x
