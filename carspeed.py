@@ -18,6 +18,7 @@ parser.add_argument('-c','--console', action='store_true', dest='setup_complete'
 parser.add_argument('-d','--distance',type=int, default=33, help='Distance in feet from lens to center of road',required=False)
 parser.add_argument('-t','--threshold',type=int, default=15, help='Detection Threshold? def=15', required=False)
 parser.add_argument('-debug', action='store_true', dest='debug', help='Debug Mode to show some of the interim steps', required=False)
+parser.add_argument('--blur', type=int, default=15, help='Blur size for processing. def=15', required=False)
 
 args = parser.parse_args()
 
@@ -66,7 +67,7 @@ THRESHOLD = args.threshold
 MIN_AREA = 175*10
 MIN_WIDTH = args.minWidth
 MIN_HEIGHT = args.minheight
-BLURSIZE = (15,15)
+BLURSIZE = (args.blur,args.blur)
 IMAGEWIDTH = args.framesize[0]
 IMAGEHEIGHT = args.framesize[1]
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
