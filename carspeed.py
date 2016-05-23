@@ -16,7 +16,8 @@ parser.add_argument('--minheight', default=100, type=int, help='Minimum Height f
 parser.add_argument('-f','--framesize',type=int, nargs=2, default=[640,480], help='Frame Size - def 640 480',required=False)
 parser.add_argument('-c','--console', action='store_true', dest='setup_complete', help='Eliminate all calls which require Xwindows to be running, MUST SUPPLY ALL ARGS! def=False',required=False)
 parser.add_argument('-d','--distance',type=int, default=33, help='Distance in feet from lens to center of road',required=False)
-
+parser.add_argument('-t','--threshold',type=int, default=15, help='Detection Threshold? def=15', required=False)
+parser.add_argument('-d', action='store_true', dest='debug', help='Debug Mode to show some of the interim steps', required=False)
 
 args = parser.parse_args()
 
@@ -61,7 +62,7 @@ def draw_rectangle(event,x,y,flags,param):
         
 # define some constants
 DISTANCE = args.distance  #<---- enter your distance-to-road value here
-THRESHOLD = 15
+THRESHOLD = args.threshold
 MIN_AREA = 175*10
 MIN_WIDTH = args.minWidth
 MIN_HEIGHT = args.minheight
@@ -71,6 +72,7 @@ IMAGEHEIGHT = args.framesize[1]
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
 FOV = 53.5
 FPS = 30
+debug = args.debug
 
 # the following enumerated values are used to make the program more readable
 WAITING = 0
@@ -198,6 +200,8 @@ print(" monitored_area {}".format(monitored_width * monitored_height))
 # capture frames from the camera (using capture_continuous.
 #   This keeps the picamera in capture mode - it doesn't need
 #   to prep for each frame's capture.
+if (debug):
+    cv2.namedWindow("Processing")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #initialize the timestamp
@@ -209,10 +213,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # crop the frame to the monitored area, convert it to grayscale, and blur it
     # crop area defined by [y1:y2,x1:x2]
     gray = image[upper_left_y:lower_right_y,upper_left_x:lower_right_x]
- 
     # convert it to grayscale, and blur it
     gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, BLURSIZE, 0)
+    if (debug):
+        cv2.imshow("Processing",gray)
  
     # if the base image has not been defined, initialize it
     if base_image is None:
@@ -244,7 +249,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # get an approximate area of the contour
         found_area = w*h 
         # find the largest bounding rectangle
-        if ((w > MIN_WIDTH or h > MIN_HEIGHT) and (found_area > biggest_area)):  
+        if ((w > MIN_WIDTH or h > MIN_HEIGHT) and (found_area >= biggest_area)):  
             biggest_area = found_area
             motion_found = True
 
@@ -306,7 +311,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # only update image and wait for a keypress when waiting for a car
     # or if 50 frames have been processed in the WAITING state.
     # This is required since waitkey slows processing.
-    if (state == WAITING) and (loop_count > 10):    
+    if (loop_count in [10,20,30,40,50]):
+            cv2.accumulateWeighted(gray, base_image, 0.25)
+
+    if (state == WAITING) or (loop_count > 50):    
  
         # draw the text and timestamp on the frame
         cv2.putText(image, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
@@ -320,15 +328,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             cv2.line(image,(lower_right_x,upper_left_y),(lower_right_x,lower_right_y),(0, 255, 0))
        
         # show the frame and check for a keypress
-        if showImage:
+        if showImage and state == WAITING:
             prompt_on_image(prompt)
             cv2.imshow("Speed Camera", image)
         if state == WAITING:
             last_x = 0
-            cv2.accumulateWeighted(gray, base_image, 0.25)
- 
-        #state=WAITING;
-        if showImage:
             key = cv2.waitKey(1) & 0xFF
       
             # if the `q` key is pressed, break from the loop and terminate processing
