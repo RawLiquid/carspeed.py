@@ -331,13 +331,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         if showImage:
             key = cv2.waitKey(1) & 0xFF
       
-        # if the `q` key is pressed, break from the loop and terminate processing
-        if key == ord("q"):
-            break
-        if (key == ord("i") and showImage == "True"):
-            showImage="False"
-        if (key == ord("i") and showImage == "False"):
-            showImage="True"
+            # if the `q` key is pressed, break from the loop and terminate processing
+            if key == ord("q"):
+                break
+            if (key == ord("i") and showImage == "True"):
+                showImage="False"
+            if (key == ord("i") and showImage == "False"):
+                showImage="True"
 
         loop_count = 0
          
