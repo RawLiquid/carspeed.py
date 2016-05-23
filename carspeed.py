@@ -117,8 +117,8 @@ mph = 0
 secs = 0.0
 show_bounds = True
 showImage = args.showImage
-ix,iy = args.detectionbox[1]
-fx,fy = args.detectionbox[2]
+ix,iy = args.detectionbox[0][0],args.detectionbox[0][1]
+fx,fy = args.detectionbox[1][0],args.detectionbox[1][1]
 drawing = False
 setup_complete = args.setup_complete
 tracking = False
@@ -244,7 +244,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # get an approximate area of the contour
         found_area = w*h 
         # find the largest bounding rectangle
-        if (found_area > MIN_AREA) and (found_area > biggest_area):  
+        if ((w > MIN_WIDTH or h > MIN_HEIGHT) and (found_area > biggest_area):  
             biggest_area = found_area
             motion_found = True
 
@@ -295,6 +295,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 # and its last position
                 last_mph = mph
                 last_x = x
+                loop_count = 0
     else:
         if state != WAITING:
             state = WAITING
@@ -326,8 +327,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             last_x = 0
             cv2.accumulateWeighted(gray, base_image, 0.25)
  
-        state=WAITING;
-        key = cv2.waitKey(1) & 0xFF
+        #state=WAITING;
+        if showImage:
+            key = cv2.waitKey(1) & 0xFF
       
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
