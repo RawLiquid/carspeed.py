@@ -5,6 +5,20 @@ import time
 import math
 import datetime
 import cv2
+import argparse
+
+
+parser = argparse.ArgumentParser(description='Approximate vehicle speed using camera.')
+parser.add_argument('-b','--detectionBox',nargs=2,default=['-1,-1', '-1,-1'], help='Bounding Box Top Left Corner, Bottom Right Corner (x,y a,b)',required=False)
+parser.add_argument('-i','--noShowImage', action='store_false', dest='showImage', help='Do not auto-update the image window def=False',required=False)
+parser.add_argument('-w','--minWidth', default=100, type=int, help='Minimum Width for detection. (OR\'d with Height) def=100', required=False)
+parser.add_argument('-h','--minheight', default=100, type=int, help='Minimum Height for detection. (OR\'d with Width) def=100', required=False)
+parser.add_argument('-f','--framesize',type=int, nargs=2, default=[640,480], help='Frame Size - def 640 480',required=False)
+parser.add_argument('-c','--console', action='store_true', dest='setup_complete', help='Eliminate all calls which require Xwindows to be running, MUST SUPPLY ALL ARGS! def=False',required=False)
+parser.add_argument('-d','--distance',type=int, default=33, help='Distance in feet from lens to center of road',required=False)
+
+
+args = parser.parse_args()
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -46,12 +60,14 @@ def draw_rectangle(event,x,y,flags,param):
         cv2.rectangle(image,(ix,iy),(fx,fy),(0,255,0),2)
         
 # define some constants
-DISTANCE = 33  #<---- enter your distance-to-road value here
+DISTANCE = args.distance  #<---- enter your distance-to-road value here
 THRESHOLD = 15
 MIN_AREA = 175*10
+MIN_WIDTH = args.minWidth
+MIN_HEIGHT = args.minheight
 BLURSIZE = (15,15)
-IMAGEWIDTH = 640
-IMAGEHEIGHT = 480
+IMAGEWIDTH = args.framesize[0]
+IMAGEHEIGHT = args.framesize[1]
 RESOLUTION = [IMAGEWIDTH,IMAGEHEIGHT]
 FOV = 53.5
 FPS = 30
@@ -100,11 +116,11 @@ abs_chg = 0
 mph = 0
 secs = 0.0
 show_bounds = True
-showImage = False
-ix,iy = 90,163
-fx,fy = 599,301
+showImage = args.showImage
+ix,iy = args.detectionbox[1]
+fx,fy = args.detectionbox[2]
 drawing = False
-setup_complete = True
+setup_complete = args.setup_complete
 tracking = False
 text_on_image = 'No cars'
 loop_count = 0
