@@ -244,7 +244,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # get an approximate area of the contour
         found_area = w*h 
         # find the largest bounding rectangle
-        if ((w > MIN_WIDTH or h > MIN_HEIGHT) and (found_area > biggest_area):  
+        if ((w > MIN_WIDTH or h > MIN_HEIGHT) and (found_area > biggest_area)):  
             biggest_area = found_area
             motion_found = True
 
