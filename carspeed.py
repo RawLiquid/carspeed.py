@@ -9,7 +9,7 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description='Approximate vehicle speed using camera.')
-parser.add_argument('-b','--detectionBox',nargs=2,default=['-1,-1', '-1,-1'], help='Bounding Box Top Left Corner, Bottom Right Corner (x,y a,b)',required=False)
+parser.add_argument('-b','--detectionBox',nargs=4, type=int, default=[-1,-1,-1,-1], help='Bounding Box Top Left Corner, Bottom Right Corner (x y a b)',required=False)
 parser.add_argument('-i','--noShowImage', action='store_false', dest='showImage', help='Do not auto-update the image window def=False',required=False)
 parser.add_argument('-w','--minWidth', default=100, type=int, help='Minimum Width for detection. (OR\'d with Height) def=100', required=False)
 parser.add_argument('--minheight', default=100, type=int, help='Minimum Height for detection. (OR\'d with Width) def=100', required=False)
