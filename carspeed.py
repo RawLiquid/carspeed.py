@@ -17,7 +17,7 @@ parser.add_argument('-f','--framesize',type=int, nargs=2, default=[640,480], hel
 parser.add_argument('-c','--console', action='store_true', dest='setup_complete', help='Eliminate all calls which require Xwindows to be running, MUST SUPPLY ALL ARGS! def=False',required=False)
 parser.add_argument('-d','--distance',type=int, default=33, help='Distance in feet from lens to center of road',required=False)
 parser.add_argument('-t','--threshold',type=int, default=15, help='Detection Threshold? def=15', required=False)
-parser.add_argument('-d', action='store_true', dest='debug', help='Debug Mode to show some of the interim steps', required=False)
+parser.add_argument('-debug', action='store_true', dest='debug', help='Debug Mode to show some of the interim steps', required=False)
 
 args = parser.parse_args()
 
