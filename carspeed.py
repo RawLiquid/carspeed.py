@@ -268,6 +268,14 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
             if state == TRACKING:       
                 secs = secs_diff(timestamp,initial_time)
+                if secs >= 15:
+                    state = WAITING
+                    direction = UNKNOWN
+                    text_on_image = 'No Car Detected'
+                    motion_found = False
+                    biggest_area = 0
+                    base_image = None
+                    break
                 if x >= last_x:
                     direction = LEFT_TO_RIGHT
                     abs_chg = x + w - initial_x
